@@ -1,0 +1,7 @@
+librosa==0.8.1
+numpy==1.19.2
+PyAudio==0.2.11
+pydub==0.25.1
+torch==1.8.2+cu111
+torchsummary==1.5.1
+tqdm==4.59.0
