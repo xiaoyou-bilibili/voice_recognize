@@ -16,5 +16,3 @@ ubuntu20.4 可以参考
 sudo apt install portaudio19-dev python3-pyaudio
 ```
 
-
-
