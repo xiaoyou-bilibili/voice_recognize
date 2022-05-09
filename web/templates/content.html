@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>声纹识别</title>
+    <link rel="stylesheet" type="text/css" href="https://www.layuicdn.com/layui/css/layui.css" />
+    <script src="https://www.layuicdn.com/layui/layui.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/layer/3.5.1/layer.js"></script>
+    <!--    引入jQuery-->
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <style>
+        .field-left{
+            width: 80%;
+        }
+        .field-right{
+            width: 20%;
+        }
+        .layui-field-box img{
+            max-width: 100%;
+        }
+        .layui-table tbody tr {
+            height: 50px;
+        }
+        .layui-table-cell{
+            height: auto;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+<div style="display: flex;align-content: center;justify-content: center">
+    <div class="layui-tab" style="width: 80%">
+          <ul class="layui-tab-title">
+            <li class="layui-this">声纹识别</li>
+          </ul>
+          <div class="layui-tab-content">
+            <div class="layui-tab-item layui-show">
+                <button type="button" class="layui-btn" id="voice_recognize">
+                  <i class="layui-icon">&#xe67c;</i>声纹识别
+                </button>
+                <button type="button" class="layui-btn" id="voice_input">
+                  <i class="layui-icon">&#xe67c;</i>声纹录入
+                </button>
+                <div style="display: flex;margin-top: 30px">
+                    <fieldset class="layui-elem-field field-right">
+                      <legend>识别信息</legend>
+                       <table id="detect" lay-filter="test"></table>
+                    </fieldset>
+                  </div>
+            </div>
+          </div>
+    </div>
+</div>
+<script type="text/html" id="barDemo">
+  <a class="layui-btn layui-btn-xs" lay-event="add">添加</a>
+</script>
+<script>
+// 选项卡依赖element模块
+layui.use('element', function(){});
+// 弹窗函数
+let index = null
+function load() {
+    index = layer.load(1, {shade: [0.6, '#000000']})
+}
+function close() {
+    layer.close(index)
+}
+// 表格显示函数
+let table = null
+layui.use('table', function(){
+    table = layui.table
+});
+// 上传功能
+layui.use('upload', function(){
+  var upload = layui.upload;
+  // 声纹识别
+  upload.render({
+    elem: '#voice_recognize', //绑定元素
+    url: '/voice_recognize/recognize', //上传接口
+    accept: 'audio', // 只允许用户上传音频
+    before: function (){
+        load()
+    },
+    done: function(res){
+        console.log(res)
+        close()
+        // 表格渲染数据
+        table.render({elem: '#detect',page: true, width: 410, data: res, cols: [[
+          {field: 'name', title: '名字', width: 100},
+          {field: 'score', title: '得分', sort: true, width: 200},
+          {field: 'is_origin', title: '置信', width: 100}
+        ]]});
+    }
+  });
+  // 声纹录入
+  upload.render({
+    elem: '#voice_input', //绑定元素
+    accept: 'audio', // 只允许用户上传音频
+    auto: false, // 不自动上传
+    choose: function (obj){
+      // 上传前我们需要输入相关信息
+      // console.log(obj)
+      obj.preview(function(index, file, result){
+        layer.prompt({
+                formType: 0,
+                value: '',
+                title: '请输入名字',
+                btn: ['确定'], //按钮，
+                btnAlign: 'c'
+            }, function(value,index){
+                console.log(result);
+                // 发送post请求
+                $.post("/voice_recognize/add", {"data": result, "name": value}, (data, _)=>{
+                  layer.msg('添加成功！', {icon: 6});
+                })
+                layer.close(index);
+            })
+      })
+      // load()
+    },
+    // done: function(res){
+    //     close()
+    //     // 修改一下图片，这里我们设置一个随机数，目的是为了刷新图片
+    //     document.getElementById("detect_face").src = res.detect + "?t=" + Math.random()
+    //     // 表格渲染数据
+    //     table.render({elem: '#detect_face_info',page: true,width: 380,data: res.face_info,cols: [[
+    //             {field: 'img', title: '图片', width: 100,templet: function(d){return '<img style="width:60px;height: 60px" src="data:image/jepg;base64,'+d.img+'" />'}},
+    //             {field: 'point', title: '坐标', width: 200},
+    //             {fixed: 'right', title: "操作", width: 70, align:'center', toolbar: '#barDemo'}
+    //     ]]});
+    // }
+  });
+});
+
+</script>
+</body>
+</html>
