@@ -1,8 +1,12 @@
+from email.mime import base
 from flask import Flask, request, Response, render_template
 from flask_cors import CORS
 import json
-from core import recognition, audio_db_path
+
+from sympy import im
+from core import recognition, audio_db_path, register
 import os
+import base64
 
 # 初始化flaskAPP
 app = Flask(__name__)
@@ -31,19 +35,16 @@ def recognize_image():
 def add_face():
     # 获取所有的参数
     data = request.form
-    file = request.files['file']
-    file.save("./web/static/row2.wav")
-    print(data)
-    # 读取文件并保存
-    # name = data["name"]
-    # img = base64_to_cv(data["img"])
-    # img = cv2.resize(img, (250, 250))
-    # # 获取图片的特征信息
-    # feature = get_feature(img)
-    # # 保存图片的特征
-    # store_feature("0", name, feature, "")
-    # save_path = os.path.join(audio_db_path, user_name + os.path.basename(path)[-4:])
-    # 返回生成的图片和种子
+    row = data["data"]
+    name = data["name"]
+    row = row.replace("data:audio/wav;base64,","")
+    save_path = os.path.join(audio_db_path, "%s.wav" % name)
+    # 保存文件
+    with open(save_path,"wb") as f:
+        f.write(base64.b64decode(row))
+    # 更新特征信息
+    register(save_path, name)
+    # 直接返回空    
     return return_json({})
 
 

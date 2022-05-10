@@ -1,18 +1,12 @@
-import argparse
-import functools
 import os
-import shutil
-from tkinter.tix import Tree
-
 import numpy as np
 import torch
 
 from utils.reader import load_audio
-from utils.utility import add_arguments, print_arguments
 
 # 服务的一些参数
 # 置信度
-threshold = 0.5
+threshold = 0.6
 input_shape = (1, 257, 257)
 # 数据库文件位置
 audio_db_path = 'audio_db'
@@ -20,13 +14,13 @@ audio_db_path = 'audio_db'
 person_feature = []
 person_name = []
 
-model = None
+# model = None
 # 设置为GPU启动
-# device = torch.device("cuda")
-# # 加载我们的模型
-# model = torch.jit.load('models/resnet34.pth')
-# model.to(device)
-# model.eval()
+device = torch.device("cuda")
+# 加载我们的模型
+model = torch.jit.load('models/resnet34.pth')
+model.to(device)
+model.eval()
 
 def infer(audio_path):
     data = load_audio(audio_path, mode='infer', spec_len=input_shape[2])
@@ -36,18 +30,15 @@ def infer(audio_path):
     feature = model(data)
     return feature.data.cpu().numpy()
 
-# # 加载音频库信息
-# audios = os.listdir(audio_db_path)
-# for audio in audios:
-#     path = os.path.join(audio_db_path, audio)
-#     name = audio[:-4]
-#     feature = infer(path)[0]
-#     person_name.append(name)
-#     person_feature.append(feature)
-#     print("Loaded %s audio." % name)
-# print("数据....")
-# print(person_feature)
-# print(person_name)
+# 加载音频库信息
+audios = os.listdir(audio_db_path)
+for audio in audios:
+    path = os.path.join(audio_db_path, audio)
+    name = audio[:-4]
+    feature = infer(path)[0]
+    person_name.append(name)
+    person_feature.append(feature)
+    print("Loaded %s audio." % name)
 
 # 识别我们的声音模型
 def recognition(path):
@@ -64,8 +55,10 @@ def recognition(path):
         response.append({
             "name": person_name[i],
             "score": float(score),
-            "is_origin": True
+            "is_origin": True if score > threshold else False
         })
+    # 对列表从大到小进行排序
+    response = sorted(response,key = lambda e:e['score'],reverse = True)
     return response
 
 

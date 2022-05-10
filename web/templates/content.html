@@ -99,36 +99,25 @@ layui.use('upload', function(){
     auto: false, // 不自动上传
     choose: function (obj){
       // 上传前我们需要输入相关信息
-      // console.log(obj)
       obj.preview(function(index, file, result){
         layer.prompt({
                 formType: 0,
                 value: '',
-                title: '请输入名字',
+                title: '请输入说话者名字',
                 btn: ['确定'], //按钮，
                 btnAlign: 'c'
             }, function(value,index){
-                console.log(result);
+                console.log(result)
+                load()
                 // 发送post请求
                 $.post("/voice_recognize/add", {"data": result, "name": value}, (data, _)=>{
-                  layer.msg('添加成功！', {icon: 6});
+                  layer.msg('添加成功！', {icon: 6})
+                  close()
                 })
                 layer.close(index);
             })
       })
-      // load()
-    },
-    // done: function(res){
-    //     close()
-    //     // 修改一下图片，这里我们设置一个随机数，目的是为了刷新图片
-    //     document.getElementById("detect_face").src = res.detect + "?t=" + Math.random()
-    //     // 表格渲染数据
-    //     table.render({elem: '#detect_face_info',page: true,width: 380,data: res.face_info,cols: [[
-    //             {field: 'img', title: '图片', width: 100,templet: function(d){return '<img style="width:60px;height: 60px" src="data:image/jepg;base64,'+d.img+'" />'}},
-    //             {field: 'point', title: '坐标', width: 200},
-    //             {fixed: 'right', title: "操作", width: 70, align:'center', toolbar: '#barDemo'}
-    //     ]]});
-    // }
+    }
   });
 });
 
