@@ -1,26 +1,17 @@
-import argparse
-import functools
-
 import numpy as np
 import torch
 from tqdm import tqdm
 
 from utils.reader import load_audio
-from utils.utility import add_arguments, print_arguments
 
-parser = argparse.ArgumentParser(description=__doc__)
-add_arg = functools.partial(add_arguments, argparser=parser)
-add_arg('list_path',        str,    'data/test_list.txt',  '测试数据的数据列表路径')
-add_arg('input_shape',      str,    '(1, 257, 257)',          '数据输入的形状')
-add_arg('model_path',       str,    'models/resnet34.pth',    '预测模型的路径')
-args = parser.parse_args()
-
-print_arguments(args)
-
-device = torch.device("cuda")
+# 评估的一些参数
+list_path = 'data/test_list.txt' # 测试集地址
+input_shape = (1, 257, 257) # 音频输入形状
+model_path = 'models/resnet34.pth' # 模型路径
+device = torch.device("cuda") # 设备类型
 
 # 加载模型
-model = torch.jit.load(args.model_path)
+model = torch.jit.load(model_path)
 model.to(device)
 model.eval()
 
@@ -44,7 +35,6 @@ def cal_accuracy(y_score, y_true):
 
 # 预测音频
 def infer(audio_path):
-    input_shape = eval(args.input_shape)
     data = load_audio(audio_path, mode='test', spec_len=input_shape[2])
     data = data[np.newaxis, :]
     data = torch.tensor(data, dtype=torch.float32, device=device)
@@ -72,7 +62,8 @@ def cosin_metric(x1, x2):
 
 
 def main():
-    features, labels = get_all_audio_feature(args.list_path)
+    # 计算所有音频的特征
+    features, labels = get_all_audio_feature(list_path)
     scores = []
     y_true = []
     print('开始两两对比音频特征...')

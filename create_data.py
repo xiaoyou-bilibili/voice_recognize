@@ -1,9 +1,6 @@
 import json
 import os
-from random import sample
 from tqdm import tqdm
-import librosa
-import numpy as np
 from pydub import AudioSegment
 from utils.reader import load_audio
 
@@ -79,6 +76,6 @@ def remove_error_audio(data_list_path):
 
 if __name__ == '__main__':
     # 首先我们获取所有的数据集
-    #get_data_list('data/text/infodata.json', 'data')
+    get_data_list('data/text/infodata.json', 'data')
     remove_error_audio('data/train_list.txt')
     remove_error_audio('data/test_list.txt')

@@ -38,6 +38,7 @@ def add_face():
     row = data["data"]
     name = data["name"]
     row = row.replace("data:audio/wav;base64,","")
+    # 保存音频文件到数据库中
     save_path = os.path.join(audio_db_path, "%s.wav" % name)
     # 保存文件
     with open(save_path,"wb") as f:
