@@ -2,6 +2,18 @@
 
 本项目参考：https://github.com/yeyupiaoling/VoiceprintRecognition-Pytorch
 
+## 效果演示
+### 声纹识别
+![](images/2022-05-11-08-56-17.png)
+### 声纹录入
+![](images/2022-05-11-08-56-47.png)
+
+## 视频演示
+
+B站：
+
+YouTube：
+
 ## 数据集准备
 
 数据集地址：https://github.com/fighting41love/zhvoice
