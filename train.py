@@ -69,24 +69,29 @@ def save_model(model, metric_fc, optimizer, epoch_id):
 
 def train():
     device_ids = [int(i) for i in gpus.split(',')]
-    # 获取数据
+    # 获取数据集
     train_dataset = CustomDataset(train_list_path, model='train', spec_len=input_shape[2])
+    # 加载我们的数据集
     train_loader = DataLoader(dataset=train_dataset,
                               batch_size=batch_size * len(device_ids),
                               shuffle=True,
                               num_workers=num_workers)
+    # 这边是加载我们的测试数据集
     test_dataset = CustomDataset(test_list_path, model='test', spec_len=input_shape[2])
     test_loader = DataLoader(dataset=test_dataset, batch_size=batch_size, num_workers=num_workers)
 
     device = torch.device("cuda")
-    # 获取模型
+    # 构建restNet模型（残差结构网络），这个网络可以可以图像分类
     model = resnet34()
+    # ArcFace Loss函数
     metric_fc = ArcNet(512, num_classes)
 
+    # 如果有多个GPU，那么就多个GPU一起训练
     if len(gpus.split(',')) > 1:
         model = DataParallel(model, device_ids=device_ids, output_device=device_ids[0])
         metric_fc = DataParallel(metric_fc, device_ids=device_ids, output_device=device_ids[0])
 
+    # 首先加载我们的模型，然后打印一下模型的结构
     model.to(device)
     metric_fc.to(device)
     if len(gpus.split(',')) > 1:
@@ -106,6 +111,7 @@ def train():
     criterion = torch.nn.CrossEntropyLoss()
 
     # 加载模型参数和优化方法参数
+    # 这里是加载一下预训练模型
     if resume:
         optimizer_state = torch.load(os.path.join(resume, 'optimizer.pth'))
         optimizer.load_state_dict(optimizer_state)
@@ -124,16 +130,21 @@ def train():
     for epoch_id in range(last_epoch, num_epoch):
         for batch_id, data in enumerate(train_loader):
             start = time.time()
+            # 获取我们的输入和标签
             data_input, label = data
             data_input = data_input.to(device)
             label = label.to(device).long()
+            # 先调用restNet获取特征值
             feature = model(data_input)
+            # 然后根据标签和特征值计算输出
             output = metric_fc(feature, label)
+            # 计算loss
             loss = criterion(output, label)
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
 
+            # 每迭代100尺就打印一下准确率和loss信息
             if batch_id % 100 == 0:
                 output = output.data.cpu().numpy()
                 output = np.argmax(output, axis=1)
@@ -144,6 +155,7 @@ def train():
                 print('[%s] Train epoch %d, batch: %d/%d, loss: %f, accuracy: %f, lr: %f, eta: %s' % (
                     datetime.now(), epoch_id, batch_id, len(train_loader), loss.item(), acc.item(), scheduler.get_lr()[0], eta_str))
         scheduler.step()
+        # 迭代完一轮后就对我们的模型进行评估
         # 开始评估
         model.eval()
         print('='*70)

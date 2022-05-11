@@ -32,7 +32,7 @@ def load_audio(audio_path, mode='train', win_length=400, sr=16000, hop_length=16
     return spec_mag
 
 
-# 数据加载器
+# 数据加载器，其实主要是因为音频需要单独加载，所以需要覆盖默认的方法
 class CustomDataset(data.Dataset):
     def __init__(self, data_list_path, model='train', spec_len=257):
         super(CustomDataset, self).__init__()
@@ -44,6 +44,7 @@ class CustomDataset(data.Dataset):
     def __getitem__(self, idx):
         audio_path, label = self.lines[idx].replace('\n', '').split('\t')
         spec_mag = load_audio(audio_path, mode=self.model, spec_len=self.spec_len)
+        # 这里会返回一个特征信息和用户的标签
         return spec_mag, np.array(int(label), dtype=np.int64)
 
     def __len__(self):

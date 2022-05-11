@@ -4,7 +4,7 @@ import torch.nn.functional as F
 from torch.nn import Parameter
 import math
 
-
+# arcface 加性角度间隔损失函数
 class ArcNet(nn.Module):
     def __init__(self,
                  feature_dim,
