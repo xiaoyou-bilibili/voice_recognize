@@ -1,5 +1,7 @@
 # 声纹识别项目-游戏/动漫 声优识别
 
+> 注意，本项目经过测试，只能用于无背景音乐下的声纹识别，背景音乐会对结果有很大影响
+
 本项目参考：https://github.com/yeyupiaoling/VoiceprintRecognition-Pytorch
 
 ## 效果演示

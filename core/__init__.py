@@ -10,7 +10,7 @@ threshold = 0.6
 input_shape = (1, 257, 257)
 # 数据库文件位置
 audio_db_path = 'audio_db'
-# 特征信息和人民信息
+# 特征信息和人名信息
 person_feature = []
 person_name = []
 
