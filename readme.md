@@ -12,9 +12,9 @@
 
 ## 视频演示
 
-B站：
+B站：https://www.bilibili.com/video/BV18F41177jb
 
-YouTube：
+YouTube：https://youtu.be/XV9NwpnLPGo
 
 ## 数据集准备
 
