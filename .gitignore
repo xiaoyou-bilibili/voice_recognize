@@ -4,3 +4,4 @@ models
 __pycache__
 audio_db
 row.wav
+.idea
