@@ -7,7 +7,7 @@ from utils.reader import load_audio
 # 评估的一些参数
 list_path = 'data/test_list.txt' # 测试集地址
 input_shape = (1, 257, 257) # 音频输入形状
-model_path = 'models/resnet34.pth' # 模型路径
+model_path = 'model/resnet34.pth' # 模型路径
 device = torch.device("cuda") # 设备类型
 
 # 加载模型

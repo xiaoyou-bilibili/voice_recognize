@@ -18,7 +18,7 @@ person_name = []
 # 设置为GPU启动
 device = torch.device("cuda")
 # 加载我们的模型
-model = torch.jit.load('models/resnet34.pth')
+model = torch.jit.load('model/resnet34.pth')
 model.to(device)
 model.eval()
 

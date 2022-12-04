@@ -4,3 +4,6 @@ PyAudio==0.2.11
 pydub==0.25.1
 torchsummary==1.5.1
 tqdm==4.59.0
+Flask~=2.1.1
+Flask-Cors~=3.0.10
+sympy~=1.11.1
